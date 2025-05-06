@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_HUB_CREDS = credentials('dockerhub-creds')
+        DOCKER_USER = "${env.DOCKER_HUB_CREDS_USR}"
+        DOCKER_PASSWORD = "${env.DOCKER_HUB_CREDS_PSW}"
+    }
 
     stages {
         stage('Cleanup Workspace') {
