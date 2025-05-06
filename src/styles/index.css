@@ -1,0 +1,43 @@
+/* Author link styling in footer */
+.author-link {
+  color: #6c757d;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s ease;
+  font-weight: 500;
+}
+
+.author-link:hover {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.author-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #007bff;
+  transition: width 0.4s ease, transform 0.3s ease;
+  transform-origin: left;
+}
+
+.author-link:hover::after {
+  width: 100%;
+  transform: scaleX(1);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
