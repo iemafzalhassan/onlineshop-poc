@@ -36,7 +36,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh 'docker run -d -p 3000:80 onelineshop:latest'
+                sh 'docker run -d -p 3000:80 iemafzal/onelineshop:latest'
             }
         }
     }
