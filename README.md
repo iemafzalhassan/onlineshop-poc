@@ -14,7 +14,7 @@ This repository is a personal proof-of-concept (POC) project demonstrating a com
 
 ---
 
-## Architecture
+## Architecture:
 
 - **Jenkins Server (EC2):** For CI/CD pipeline orchestration.
 - **Docker Host (EC2):** For building, scanning, and running containers.
