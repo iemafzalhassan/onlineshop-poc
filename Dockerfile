@@ -8,7 +8,7 @@ WORKDIR /onlineshop-poc
 COPY package*.json  ./
 
 # To install dependancy
-RUN npm install
+RUN npm i
 
 # copy code from source to destination
 COPY . .
