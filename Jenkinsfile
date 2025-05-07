@@ -1,47 +1,76 @@
+@Library('shared') _
+
 pipeline {
     agent any
+
     environment {
-        DOCKER_HUB_CREDS = credentials('dockerhub-creds')
-        dockerUser = "${env.DOCKER_HUB_CREDS_USR}"
-        dockerpassword = "${env.DOCKER_HUB_CREDS_PSW}"
+        DOCKER_IMAGE_NAME = 'devshubh2204/onlineshop-poc'
+        DOCKER_IMAGE_TAG = "${BUILD_NUMBER}"
+        GITHUB_CREDENTIALS = credentials('git-hub-cred')
+        GIT_BRANCH = "feature"
     }
 
     stages {
         stage('Cleanup Workspace') {
             steps {
-                cleanWs()
+                script {
+                    clean_ws()
+                }
             }
         }
-        stage('Git Clone') {
+
+        stage('Checkout Code') {
             steps {
-                checkout scm
+                script {
+                    checkout_code(
+                        github_credentials: GITHUB_CREDENTIALS,
+                        branch: GIT_BRANCH
+                    )
+                }
             }
         }
-        stage('Build Image') {
+
+        stage('Build Docker Image') {
             steps {
-                sh 'docker build -t onelineshop:latest .'
+                script {
+                    docker_build(
+                        imageName: DOCKER_IMAGE_NAME,
+                        imageTag: DOCKER_IMAGE_TAG,
+                        dockerfile: 'Dockerfile',
+                        context: '.'
+                    )
+                }
             }
         }
-        stage('Push Image') {
+
+        stage('Security Scan with Trivy') {
             steps {
-                sh 'docker tag onelineshop:latest iemafzal/onelineshop:latest'
-                sh 'echo ${dockerpassword} | docker login -u ${dockerUser} --password-stdin'
-                sh 'docker push iemafzal/onelineshop:latest'
+                script {
+                    trivy()
+                }
             }
         }
-        stage('Trivy') {
+
+        stage('Push Docker Image') {
             steps {
-                sh """
-                docker run --rm \
-                    -v /var/run/docker.sock:/var/run/docker.sock \
-                    aquasec/trivy image --exit-code 1 --severity LOW,MEDIUM,HIGH --format table --output trivy-report.txt iemafzal/onelineshop:latest
-                """
+                script {
+                    docker_push(
+                        imageName: DOCKER_IMAGE_NAME,
+                        imageTag: DOCKER_IMAGE_TAG,
+                        credentials: 'docker-hub-cred'
+                    )
+                }
             }
-            
         }
+
         stage('Deploy') {
             steps {
-                sh 'docker run -d -p 3000:80 iemafzal/onelineshop:latest'
+                script {
+                    runDockerContainer(
+                        image: 'devshubh2204/onlineshop-poc:latest',
+                        ports: '3000:80'
+                    )
+                }
             }
         }
     }
