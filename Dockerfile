@@ -20,6 +20,8 @@ RUN npm run build
 
 FROM nginx:alpine
 
+RUN user -aG nonroot
+
 # Copy the built files from the build stage
 COPY --from=build /onlineshop-poc/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
